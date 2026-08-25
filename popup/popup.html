@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Bouncer</title>
+<link rel="stylesheet" href="../utils/theme.css" />
+<style>
+  body {
+    width: 328px;
+    margin: 0;
+    padding: 14px 18px 18px;
+    min-height: auto;
+  }
+  .pop-card {
+    background: var(--surface);
+    border: var(--border-w) solid #000;
+    box-shadow: 8px 8px 0 #000;
+    padding: 20px;
+  }
+  h1 {
+    font-size: 20px;
+    font-weight: 900;
+    margin: 0 0 3px;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #000;
+  }
+  p.subtitle {
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin: 0 0 16px;
+    text-align: center;
+    font-weight: 600;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #000;
+  }
+  .setup, .locked {
+    display: none;
+  }
+  .setup.visible, .locked.visible {
+    display: block;
+  }
+
+  /* ---- setup view ---- */
+  label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--ink-soft);
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .minutes-input-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 9px;
+    margin-bottom: 18px;
+  }
+  input[type="number"] {
+    width: 92px;
+    padding: 8px;
+    font-family: var(--font-mono);
+    font-size: 28px;
+    font-weight: 700;
+    text-align: center;
+  }
+  .unit-label {
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .start-btn {
+    width: 100%;
+    padding: 13px;
+    font-size: 13px;
+  }
+  .hint {
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    text-align: center;
+    margin: 10px 0 0;
+  }
+  .manage-btn {
+    width: 100%;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 2px solid #000;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  /* ---- locked view ---- */
+  .cat-stage {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 10px;
+  }
+  .cat-stage img {
+    width: 100px;
+    height: 100px;
+    object-fit: contain;
+  }
+  .cat-caption {
+    text-align: center;
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-bottom: 14px;
+    min-height: 14px;
+    font-style: italic;
+    font-weight: 600;
+  }
+  .status-line {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    justify-content: center;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #000;
+    margin-bottom: 12px;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border: 1.5px solid #000;
+  }
+  .countdown-ring {
+    background: var(--well-bg);
+    border: var(--border-w) solid #000;
+    padding: 16px 0;
+    text-align: center;
+    margin-bottom: 14px;
+  }
+  .countdown {
+    font-size: 40px;
+    color: #000;
+  }
+  .locked-note {
+    text-align: center;
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-bottom: 14px;
+    font-weight: 600;
+  }
+  .stop-btn {
+    width: 100%;
+    padding: 11px;
+    font-size: 12px;
+    background: var(--well-bg);
+    color: var(--ink-faint);
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  .stop-btn:hover {
+    transform: none;
+  }
+  .emergency-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px;
+    font-size: 11.5px;
+    background: var(--danger-soft);
+    color: var(--danger-deep);
+  }
+</style>
+</head>
+<body>
+  <div class="pop-card">
+    <h1>Bouncer</h1>
+    <p class="subtitle">No distractions past this point.</p>
+
+    <div class="setup" id="setupView">
+      <label for="customDuration">Set the guest list timer</label>
+      <div class="minutes-input-row">
+        <input type="number" id="customDuration" min="1" max="1440" step="1" placeholder="25" />
+        <span class="unit-label">minutes</span>
+      </div>
+      <button class="btn btn-primary start-btn" id="startBtn">Start Session</button>
+      <p class="hint">Once started, it can't be stopped early.</p>
+      <button class="btn btn-ghost manage-btn" id="dashboardBtn" type="button">Guest List &amp; Dashboard</button>
+    </div>
+
+    <div class="locked" id="lockedView">
+      <div class="cat-stage">
+        <img id="catImage" src="" alt="cat mood" />
+      </div>
+      <p class="cat-caption" id="catCaption"></p>
+      <div class="status-line"><span class="dot"></span>Bouncer is watching</div>
+      <div class="countdown-ring">
+        <div class="countdown numeral" id="countdown">00:00</div>
+      </div>
+      <p class="locked-note">The bouncer doesn't take bribes. Locked until time's up.</p>
+      <button class="btn stop-btn" id="stopBtn" disabled>Locked Until Timer Ends</button>
+      <button class="btn emergency-btn" id="emergencyBtn" type="button">Emergency Break</button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

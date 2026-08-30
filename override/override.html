@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Emergency Override</title>
+<link rel="stylesheet" href="../utils/theme.css" />
+<style>
+  :root {
+    --tile-blue: #2f6fed;
+    --tile-red: #ff0000;
+    --tile-green: #00c853;
+    --tile-amber: #f5a623;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .card {
+    width: calc(100% - 40px);
+    margin: 20px;
+    padding: 24px;
+    text-align: center;
+    background: var(--surface);
+    border: var(--border-w) solid #000;
+    box-shadow: 8px 8px 0 #000;
+  }
+  h1 {
+    font-size: 19px;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #000;
+    margin: 0 0 10px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid #000;
+  }
+  .game-instructions {
+    font-size: 12px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin: 0 0 20px;
+    line-height: 1.5;
+  }
+  .tile-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin: 0 auto 18px;
+    width: 220px;
+  }
+  .tile {
+    width: 100%;
+    aspect-ratio: 1;
+    border: var(--border-w) solid #000;
+    box-shadow: 5px 5px 0 #000;
+    cursor: pointer;
+    opacity: 0.55;
+    transition: opacity 0.1s ease, transform 0.1s ease, box-shadow 0.1s ease;
+    padding: 0;
+  }
+  .tile:hover {
+    opacity: 0.75;
+  }
+  .tile:active {
+    transform: translate(3px, 3px);
+    box-shadow: 2px 2px 0 #000;
+  }
+  .tile.active {
+    opacity: 1;
+    transform: translate(2px, 2px);
+    box-shadow: 3px 3px 0 #000;
+  }
+  .tile-blue {
+    background: var(--tile-blue);
+  }
+  .tile-red {
+    background: var(--tile-red);
+  }
+  .tile-green {
+    background: var(--tile-green);
+  }
+  .tile-amber {
+    background: var(--tile-amber);
+  }
+  .game-status {
+    font-size: 13px;
+    font-weight: 800;
+    color: #000;
+    min-height: 18px;
+    margin: 0 0 20px;
+  }
+  #cancelBtn {
+    width: 100%;
+    padding: 10px;
+    font-size: 11.5px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Emergency Override</h1>
+    <p class="game-instructions">Bouncer's not just going to let you out. Watch the sequence, then repeat it exactly to end your session early.</p>
+
+    <div class="tile-grid">
+      <button class="tile tile-blue" data-tile="0" aria-label="blue"></button>
+      <button class="tile tile-red" data-tile="1" aria-label="red"></button>
+      <button class="tile tile-green" data-tile="2" aria-label="green"></button>
+      <button class="tile tile-amber" data-tile="3" aria-label="amber"></button>
+    </div>
+
+    <p class="game-status" id="gameStatus">Get ready...</p>
+
+    <button class="btn btn-ghost" id="cancelBtn" type="button">Nevermind, back to focus</button>
+  </div>
+
+  <script src="override.js"></script>
+</body>
+</html>

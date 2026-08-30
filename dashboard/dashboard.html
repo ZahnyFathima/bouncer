@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Bouncer Dashboard</title>
+<link rel="stylesheet" href="../utils/theme.css" />
+<style>
+  body {
+    margin: 0;
+  }
+  .page {
+    max-width: 1720px;
+    padding: 52px 48px 64px;
+  }
+  header.top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 40px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  h1 {
+    font-size: 26px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin: 0 0 4px;
+    color: #000;
+  }
+  p.subtitle {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin: 0;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+  .account-chip {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border: var(--border-w) solid #000;
+    box-shadow: 4px 4px 0 #000;
+    padding: 9px 14px;
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    white-space: nowrap;
+    font-weight: 600;
+  }
+  .account-chip strong {
+    color: #000;
+    font-weight: 800;
+  }
+  .signout-btn {
+    background: none;
+    border: none;
+    color: var(--accent-deep);
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 11.5px;
+    cursor: pointer;
+    padding: 0;
+  }
+  .signout-btn:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .columns {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+  @media (max-width: 900px) {
+    .columns {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .col-heading {
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #000;
+    margin: 0 0 14px;
+  }
+
+  section.card {
+    background: var(--surface);
+    border: var(--border-w) solid #000;
+    box-shadow: 8px 8px 0 #000;
+  }
+  section.card .card-body {
+    padding: 22px;
+  }
+
+  /* ---- guest list column ---- */
+  .session-card {
+    margin-bottom: 28px;
+  }
+  .cat-stage-lg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto 14px;
+  }
+  .cat-stage-lg img {
+    width: 180px;
+    height: 180px;
+    object-fit: contain;
+  }
+  .cat-caption {
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    margin: 0 0 16px;
+    min-height: 14px;
+    font-style: italic;
+    font-weight: 600;
+  }
+  .minutes-input-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 9px;
+    margin-bottom: 18px;
+  }
+  .minutes-input-row input[type="number"] {
+    width: 92px;
+    padding: 8px;
+    font-family: var(--font-mono);
+    font-size: 28px;
+    font-weight: 700;
+    text-align: center;
+  }
+  .unit-label {
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .session-start-btn {
+    width: 100%;
+    padding: 13px;
+    font-size: 13px;
+  }
+  .hint {
+    font-size: 10.5px;
+    color: var(--ink-faint);
+    text-align: center;
+    margin: 10px 0 0;
+  }
+  .status-line {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    justify-content: center;
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #000;
+    margin-bottom: 12px;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border: 1.5px solid #000;
+  }
+  .countdown-ring {
+    background: var(--well-bg);
+    border: var(--border-w) solid #000;
+    padding: 16px 0;
+    text-align: center;
+    margin-bottom: 14px;
+  }
+  .countdown {
+    font-size: 40px;
+    color: #000;
+  }
+  .locked-note {
+    text-align: center;
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin: 0;
+    font-weight: 600;
+  }
+  .session-locked {
+    display: none;
+  }
+  .session-locked.visible {
+    display: block;
+  }
+  .session-setup.hidden {
+    display: none;
+  }
+
+  .guest-list-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  section.card h2 {
+    font-size: 16px;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin: 0 0 10px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #000;
+    color: #000;
+  }
+  section.card p.desc {
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin: 0 0 14px;
+    line-height: 1.5;
+    font-weight: 600;
+  }
+  .add-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  input[type="text"], input[type="email"], input[type="password"] {
+    padding: 9px 12px;
+    font-size: 13px;
+    min-width: 0;
+  }
+  .add-row input {
+    flex: 1;
+  }
+  .add-btn {
+    padding: 9px 16px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .block .add-btn {
+    background: var(--danger);
+    color: #ffffff;
+  }
+  .block .add-btn:hover {
+    background: #d40000;
+    box-shadow: 7px 7px 0 var(--danger-deep);
+  }
+  .allow .add-btn {
+    background: #000;
+    color: #ffffff;
+  }
+  .allow .add-btn:hover {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 7px 7px 0 var(--accent-deep);
+  }
+  ul.site-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  ul.site-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--well-bg);
+    border: 2px solid #000;
+    padding: 8px 10px;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  ul.site-list li .domain {
+    word-break: break-all;
+  }
+  ul.site-list li button {
+    border: none;
+    background: none;
+    color: var(--ink-soft);
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px 4px;
+  }
+  ul.site-list li button:hover {
+    color: var(--danger);
+  }
+  .empty-note {
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    font-style: italic;
+    padding: 4px 0;
+  }
+  .footer-note {
+    margin-top: 4px;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    font-weight: 600;
+  }
+
+  /* ---- dashboard column: auth flip card ---- */
+  /* Adapted from a Uiverse.io flip-card toggle (by andrew-demchenk0), with
+     fixes for use here:
+     - The original nests the 320px-tall flip card inside the 20px-tall
+       .switch flex container so the pure-CSS `.toggle:checked ~` sibling
+       selectors can reach it. Since the flip card's real content is all
+       position:absolute, it contributes ~0 to .switch's intrinsic size,
+       so flexbox's default shrink behavior was crushing it down toward
+       .switch's tiny declared height. Fixed by pulling .flip-card__inner
+       out as a sibling of .switch (not a child of it) and driving the
+       flip with a JS class toggle instead of a CSS sibling selector.
+     - `translateY(-200px)` on .switch assumed a taller standalone demo
+       page and would shove this widget off-screen here, so it's dropped.
+     - `background-color: var(--bg-colorcolor)` on .slider was a typo in
+       the source referencing an undefined variable; fixed to
+       `--bg-color-alt`.
+     Colors are mapped onto our own brutalist tokens instead of the
+     snippet's originals. */
+  .auth-card-wrapper {
+    --input-focus: var(--accent);
+    --font-color: #000;
+    --font-color-sub: var(--ink-soft);
+    --bg-color: #fff;
+    --bg-color-alt: var(--well-bg);
+    --main-color: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 28px;
+  }
+  .switch-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+  }
+  .switch-label {
+    font-weight: 700;
+    font-size: 13px;
+    color: var(--font-color);
+    cursor: pointer;
+    user-select: none;
+  }
+  .switch-label.active {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 20px;
+    cursor: pointer;
+  }
+  .toggle {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .slider {
+    box-sizing: border-box;
+    border: 2px solid var(--main-color);
+    box-shadow: 4px 4px var(--main-color);
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--bg-color-alt);
+    transition: 0.3s;
+  }
+  .slider:before {
+    box-sizing: border-box;
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    border: 2px solid var(--main-color);
+    left: -2px;
+    bottom: 2px;
+    background-color: var(--bg-color);
+    box-shadow: 0 3px 0 var(--main-color);
+    transition: 0.3s;
+  }
+  .toggle:checked + .slider {
+    background-color: var(--input-focus);
+  }
+  .toggle:checked + .slider:before {
+    transform: translateX(30px);
+  }
+  .flip-card__inner {
+    width: 300px;
+    height: 320px;
+    position: relative;
+    background-color: transparent;
+    perspective: 1000px;
+    text-align: center;
+    transition: transform 0.8s;
+    transform-style: preserve-3d;
+  }
+  .auth-card-wrapper.flipped .flip-card__inner {
+    transform: rotateY(180deg);
+  }
+  .flip-card__front, .flip-card__back {
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    background: lightgrey;
+    gap: 18px;
+    border: 2px solid var(--main-color);
+    box-shadow: 4px 4px var(--main-color);
+  }
+  .flip-card__back {
+    transform: rotateY(180deg);
+  }
+  .flip-card__form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .title {
+    font-size: 22px;
+    font-weight: 900;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--main-color);
+  }
+  .flip-card__input {
+    width: 220px;
+    height: 40px;
+    border: 2px solid var(--main-color);
+    background-color: var(--bg-color);
+    box-shadow: 4px 4px var(--main-color);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--font-color);
+    padding: 5px 10px;
+    outline: none;
+  }
+  .flip-card__input::placeholder {
+    color: var(--font-color-sub);
+    opacity: 0.8;
+  }
+  .flip-card__input:focus {
+    border: 2px solid var(--input-focus);
+  }
+  .flip-card__btn {
+    width: 120px;
+    height: 40px;
+    border: 2px solid var(--main-color);
+    background-color: var(--bg-color);
+    box-shadow: 4px 4px var(--main-color);
+    font-size: 15px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--font-color);
+    cursor: pointer;
+  }
+  .flip-card__btn:active {
+    box-shadow: 0px 0px var(--main-color);
+    transform: translate(4px, 4px);
+  }
+  .auth-message {
+    font-size: 12px;
+    margin-top: 16px;
+    line-height: 1.5;
+    font-weight: 600;
+    text-align: center;
+  }
+  .auth-message.error {
+    color: var(--danger);
+  }
+  .auth-message.info {
+    color: var(--accent-deep);
+  }
+  .config-warning {
+    font-size: 12.5px;
+    color: #000;
+    background: var(--danger-soft);
+    border: var(--border-w) solid #000;
+    box-shadow: 6px 6px 0 #000;
+    padding: 14px 16px;
+    line-height: 1.5;
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+
+  .stat-tiles {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 700px) {
+    .stat-tiles {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  .stat-tile {
+    background: var(--surface);
+    border: var(--border-w) solid #000;
+    box-shadow: 5px 5px 0 #000;
+    padding: 16px 18px;
+  }
+  .stat-tile .value {
+    font-size: 26px;
+    color: #000;
+    line-height: 1.1;
+  }
+  .stat-tile .label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    margin-top: 6px;
+  }
+  table.daily {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  table.daily th:nth-child(1), table.daily td:nth-child(1) { width: 160px; }
+  table.daily th:nth-child(2), table.daily td:nth-child(2) { width: 100px; }
+  table.daily th:nth-child(3), table.daily td:nth-child(3) { width: 130px; }
+  table.daily th:nth-child(4), table.daily td:nth-child(4) { width: auto; }
+  table.daily th {
+    text-align: left;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #000;
+    padding: 0 10px 10px;
+    border-bottom: 2px solid #000;
+  }
+  table.daily td {
+    padding: 11px 10px;
+    border-bottom: 2px solid #000;
+    vertical-align: middle;
+    font-weight: 600;
+  }
+  table.daily tr:last-child td {
+    border-bottom: none;
+  }
+  .bar-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .bar-track {
+    flex: 1;
+    height: 8px;
+    background: var(--well-bg);
+    border: 1.5px solid #000;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: var(--danger);
+    transition: width 0.3s ease;
+  }
+  .empty-state, .loading-state {
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-style: italic;
+    padding: 8px 0;
+  }
+  #analyticsSection {
+    display: none;
+  }
+
+  /* ---- streaks card ---- */
+  #analyticsSection section.card + section.card {
+    margin-top: 20px;
+  }
+  .goal-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 12.5px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .goal-row label {
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    font-size: 11px;
+  }
+  .goal-row input[type="number"] {
+    width: 56px;
+    padding: 6px 8px;
+    font-size: 13px;
+    text-align: center;
+  }
+  #goalSaveBtn {
+    padding: 8px 14px;
+    font-size: 11.5px;
+    margin-left: auto;
+  }
+  .streak-summary {
+    font-size: 13px;
+    font-weight: 800;
+    color: #000;
+    margin: 4px 0 20px;
+  }
+  .streak-layout {
+    display: flex;
+    gap: 0;
+    align-items: stretch;
+  }
+  .calendar-col {
+    flex: 0 0 auto;
+    padding-right: 24px;
+  }
+  .top-sites-col {
+    flex: 1;
+    min-width: 0;
+    padding-left: 24px;
+    border-left: 2px solid #000;
+  }
+  .top-sites-col .col-heading {
+    margin: 0 0 12px;
+  }
+  @media (max-width: 560px) {
+    .streak-layout {
+      flex-direction: column;
+    }
+    .calendar-col {
+      padding-right: 0;
+      padding-bottom: 20px;
+    }
+    .top-sites-col {
+      padding-left: 0;
+      padding-top: 20px;
+      border-left: none;
+      border-top: 2px solid #000;
+    }
+  }
+  ul.site-rank-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .site-rank-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .site-rank-domain {
+    width: 150px;
+    flex-shrink: 0;
+    font-size: 12.5px;
+    font-weight: 700;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .site-rank-count {
+    width: 20px;
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: right;
+  }
+  .calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+  .cal-nav-btn {
+    padding: 4px 10px;
+    font-size: 13px;
+    box-shadow: 3px 3px 0 #000;
+  }
+  .cal-nav-btn:hover {
+    box-shadow: 4px 4px 0 #000;
+  }
+  .cal-nav-btn:active {
+    box-shadow: none;
+  }
+  .cal-month-label {
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    min-width: 140px;
+    text-align: center;
+  }
+  .calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    margin: 0 0 4px;
+    max-width: 224px;
+  }
+  .calendar-weekdays span {
+    text-align: center;
+    font-size: 9.5px;
+    font-weight: 800;
+    color: var(--ink-faint);
+  }
+  .calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    margin: 0;
+    max-width: 224px;
+  }
+  .cal-day {
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10.5px;
+    font-weight: 700;
+    border: 1.5px solid #000;
+    background: var(--surface);
+  }
+  .cal-day.empty {
+    border: none;
+    background: transparent;
+  }
+  .cal-day.met {
+    background: var(--success);
+    color: #ffffff;
+  }
+  .cal-day.missed {
+    background: var(--danger-soft);
+    color: var(--danger-deep);
+  }
+  .cal-day.today {
+    box-shadow: 0 0 0 2px var(--accent) inset;
+  }
+  .calendar-legend {
+    display: flex;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 12px;
+    font-size: 10px;
+    color: var(--ink-soft);
+    font-weight: 600;
+  }
+  .legend-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border: 1.5px solid #000;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+  .legend-dot.met {
+    background: var(--success);
+  }
+  .legend-dot.missed {
+    background: var(--danger-soft);
+  }
+  .legend-dot.none {
+    background: var(--surface);
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <header class="top">
+      <div class="brand">
+        <div>
+          <h1>Bouncer</h1>
+          <p class="subtitle">Your guest list and your focus stats, in one place.</p>
+        </div>
+      </div>
+      <div class="account-chip" id="accountChip" style="display: none;">
+        <span>Signed in as <strong id="accountEmail"></strong></span>
+        <button class="signout-btn" id="signOutBtn" type="button">Sign out</button>
+      </div>
+    </header>
+
+    <div class="columns">
+      <div>
+        <p class="col-heading">Start a Session</p>
+        <section class="card session-card">
+          <div class="card-body">
+            <div class="session-setup" id="dashSetupView">
+              <div class="cat-stage-lg">
+                <img src="../icons/cats/1_cat.png" alt="Bouncer cat" />
+              </div>
+              <div class="minutes-input-row">
+                <input type="number" id="dashCustomDuration" min="1" max="1440" step="1" placeholder="25" />
+                <span class="unit-label">minutes</span>
+              </div>
+              <button class="btn btn-primary session-start-btn" id="dashStartBtn">Start Session</button>
+              <p class="hint">Once started, it can't be stopped early.</p>
+            </div>
+
+            <div class="session-locked" id="dashLockedView">
+              <div class="cat-stage-lg">
+                <img id="dashCatImage" src="" alt="cat mood" />
+              </div>
+              <p class="cat-caption" id="dashCatCaption"></p>
+              <div class="status-line"><span class="dot"></span>Bouncer is watching</div>
+              <div class="countdown-ring">
+                <div class="countdown numeral" id="dashCountdown">00:00</div>
+              </div>
+              <p class="locked-note">The bouncer doesn't take bribes. Locked until time's up.</p>
+            </div>
+          </div>
+        </section>
+
+        <p class="col-heading">Guest List</p>
+        <div class="guest-list-sections">
+          <section class="card block">
+            <div class="card-body">
+              <h2>Always Block</h2>
+              <p class="desc">Closed on sight during a session, no classification needed.</p>
+              <div class="add-row">
+                <input type="text" id="blocklistInput" placeholder="e.g. reddit.com" />
+                <button class="btn add-btn" id="blocklistAddBtn">Block</button>
+              </div>
+              <ul class="site-list" id="blocklistItems"></ul>
+            </div>
+          </section>
+
+          <section class="card allow">
+            <div class="card-body">
+              <h2>Never Block</h2>
+              <p class="desc">Always safe, even if they'd otherwise look like a distraction.</p>
+              <div class="add-row">
+                <input type="text" id="whitelistInput" placeholder="e.g. mail.google.com" />
+                <button class="btn add-btn" id="whitelistAddBtn">Allow</button>
+              </div>
+              <ul class="site-list" id="whitelistItems"></ul>
+            </div>
+          </section>
+
+          <p class="footer-note">google.com, github.com, stackoverflow.com, developer.mozilla.org and localhost are always allowed by default.</p>
+        </div>
+      </div>
+
+      <div>
+        <p class="col-heading">Dashboard</p>
+
+        <div id="configWarning" class="config-warning" style="display: none;">
+          Supabase isn't configured yet, so accounts and analytics aren't available. Fill in the project URL and anon key in utils/supabaseConfig.js to turn this on.
+        </div>
+
+        <div class="auth-card-wrapper" id="authCard" style="display: none;">
+          <div class="switch-row">
+            <span class="switch-label active" id="loginLabel" data-mode="login">Log in</span>
+            <label class="switch" for="authToggle">
+              <input type="checkbox" class="toggle" id="authToggle" />
+              <span class="slider"></span>
+            </label>
+            <span class="switch-label" id="signupLabel" data-mode="signup">Sign up</span>
+          </div>
+          <div class="flip-card__inner">
+            <div class="flip-card__front">
+              <div class="title">Log in</div>
+              <form class="flip-card__form" id="loginForm">
+                <input type="email" class="flip-card__input" id="loginEmail" placeholder="Email" autocomplete="email" required />
+                <input type="password" class="flip-card__input" id="loginPassword" placeholder="Password" autocomplete="current-password" required minlength="6" />
+                <button class="flip-card__btn" type="submit">Log in</button>
+              </form>
+            </div>
+            <div class="flip-card__back">
+              <div class="title">Sign up</div>
+              <form class="flip-card__form" id="signupForm">
+                <input type="email" class="flip-card__input" id="signupEmail" placeholder="Email" autocomplete="email" required />
+                <input type="password" class="flip-card__input" id="signupPassword" placeholder="Password" autocomplete="new-password" required minlength="6" />
+                <button class="flip-card__btn" type="submit">Sign up</button>
+              </form>
+            </div>
+          </div>
+          <p class="auth-message" id="authMessage"></p>
+        </div>
+
+        <section id="analyticsSection">
+          <div class="stat-tiles">
+            <div class="stat-tile">
+              <div class="value numeral" id="statSessions">0</div>
+              <div class="label">Total sessions</div>
+            </div>
+            <div class="stat-tile">
+              <div class="value numeral" id="statFocusTime">0h 0m</div>
+              <div class="label">Total focus time</div>
+            </div>
+            <div class="stat-tile">
+              <div class="value numeral" id="statDistractions">0</div>
+              <div class="label">Distractions blocked</div>
+            </div>
+            <div class="stat-tile">
+              <div class="value numeral" id="statAvg">0</div>
+              <div class="label">Avg. distractions / session</div>
+            </div>
+          </div>
+
+          <section class="card streaks-card">
+            <div class="card-body">
+              <h2>Distraction Goal &amp; Streak</h2>
+              <div class="goal-row">
+                <label for="goalInput">Distracted no more than</label>
+                <input type="number" id="goalInput" min="0" max="99" value="5" />
+                <span>times a day</span>
+                <button class="btn btn-primary" id="goalSaveBtn" type="button">Save</button>
+              </div>
+              <p class="streak-summary" id="streakSummary">Current streak: 0 days</p>
+
+              <div class="streak-layout">
+                <div class="calendar-col">
+                  <div class="calendar-header">
+                    <button class="btn cal-nav-btn" id="calPrevBtn" type="button">&larr;</button>
+                    <span class="cal-month-label" id="calMonthLabel"></span>
+                    <button class="btn cal-nav-btn" id="calNextBtn" type="button">&rarr;</button>
+                  </div>
+                  <div class="calendar-weekdays">
+                    <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                  </div>
+                  <div class="calendar-grid" id="calendarGrid"></div>
+
+                  <div class="calendar-legend">
+                    <span><i class="legend-dot met"></i>Goal met</span>
+                    <span><i class="legend-dot missed"></i>Goal missed</span>
+                    <span><i class="legend-dot none"></i>No session</span>
+                  </div>
+                </div>
+
+                <div class="top-sites-col">
+                  <p class="col-heading">Top Distracting Sites</p>
+                  <p class="empty-note" id="topSitesEmpty">No distractions logged yet.</p>
+                  <ul class="site-rank-list" id="topSitesList"></ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="card-body">
+              <p class="loading-state" id="loadingState">Loading your stats...</p>
+              <p class="empty-state" id="emptyState" style="display: none;">No sessions yet. Start a focus session to see your stats here.</p>
+              <table class="daily" id="dailyTable" style="display: none;">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Sessions</th>
+                    <th>Focus time</th>
+                    <th>Distractions</th>
+                  </tr>
+                </thead>
+                <tbody id="dailyTableBody"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script src="../utils/supabaseConfig.js"></script>
+  <script src="../utils/supabaseAuth.js"></script>
+  <script src="dashboard.js"></script>
+</body>
+</html>
